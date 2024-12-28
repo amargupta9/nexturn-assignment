@@ -1,0 +1,429 @@
+//app.py
+from app import create_app
+
+app = create_app()
+
+if __name__ == '__main__':
+    app.run(debug=True)
+
+    //about.html 
+    {% extends "base.html" %}
+
+{% block title %}
+About
+{% endblock %}
+
+{% block content %}
+<h2>Details about the project</h2>
+<p>{{ message }}</p>
+{% endblock %}
+
+//base.html 
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Flask Project{% endblock %}</title>
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+
+<body>
+    <header class="bg-light border-bottom mb-4">
+        <nav class="navbar navbar-expand-lg navbar-light bg-light">
+            <div class="container-fluid">
+                <a class="navbar-brand" href="#">Flask Project</a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                    aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav">
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('main_routes.home') }}">Home</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('main_routes.about') }}">About</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('product_routes.index') }}">Products</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('product_routes.create') }}">Create Product</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('category_routes.index') }}">Categories</a> <!-- Add this line -->
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main class="container">
+        {% block content %}
+        {% endblock %}
+    </main>
+
+    <footer class="bg-light text-center py-3 mt-4">
+        <p>&copy; 2024 My flask project</p>
+    </footer>
+
+    <!-- Bootstrap JS and Popper.js (for responsive features like the navbar toggle) -->
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.min.js"></script>
+</body>
+
+</html>
+
+
+//categories.html 
+{% extends "base.html" %}
+
+{% block title %}Categories{% endblock %}
+
+{% block content %}
+<div class="container my-4">
+    <h3 class="mb-4">Category List</h3>
+
+    <!-- Table for displaying categories without ID -->
+    <table class="table table-striped table-bordered">
+        <thead class="thead-dark">
+            <tr>
+                <th>Categories</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for category in categories %}
+            <tr>
+                <td>{{ category.name }}</td>
+                <td>
+                    <a href="{{ url_for('category_routes.update', category_id=category.id) }}" class="btn btn-dark btn-sm">Update</a>
+                    <form method="post" action="{{ url_for('category_routes.delete', category_id=category.id) }}" style="display:inline;">
+                        <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="{{ url_for('category_routes.create') }}" class="btn btn-primary">Create Category</a>
+</div>
+{% endblock %}
+
+//create_category.html 
+{% extends "base.html" %}
+
+{% block title %}Create Category{% endblock %}
+
+{% block content %}
+<div class="container my-4">
+    <h3 class="mb-4">Create a New Category</h3>
+    <form method="post" action="{{ url_for('category_routes.create') }}">
+        <div class="mb-3">
+            <label for="name" class="form-label">Category Name:</label>
+            <input type="text" class="form-control" id="name" name="name" required>
+        </div>
+        <button type="submit" class="btn btn-primary">Create Category</button>
+    </form>
+</div>
+{% endblock %}
+
+
+//create product.html
+{% extends "base.html" %}
+
+{% block title %}
+Create Product
+{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2 class="mb-3">Create a New Product</h2>
+
+    <form method="post" action="{{ url_for('product_routes.create') }}">
+        <div class="mb-3">
+            <label for="name" class="form-label">Name:</label>
+            <input type="text" id="name" name="name" class="form-control" required>
+        </div>
+
+        <div class="mb-3">
+            <label for="ID" class="form-label">ID:</label>
+            <input type="number" id="ID" name="ID" class="form-control" required>
+        </div>
+
+        <div class="mb-3">
+            <label for="price" class="form-label">Price:</label>
+            <input type="number" id="price" name="price" class="form-control" step="0.01" required>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Create Product</button>
+    </form>
+</div>
+{% endblock %}
+//home .html 
+{% extends "base.html" %}
+
+{% block title %}
+Home
+{% endblock %}
+
+{% block content %}
+<h2>Welcome to this page</h2>
+<p>This is the main page of the Flask project.</p>
+{% endblock %}
+
+//index.html 
+{% extends "base.html" %}
+
+{% block title %}Products Page{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h3 class="mb-3">Product List</h3>
+
+    <table class="table table-striped table-bordered">
+        <thead class="table-light">
+            <tr>
+                <th>Id</th>
+                <th>Name</th>
+                <th>Price</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for product in products %}
+            <tr>
+                <td>{{ product.id }}</td>
+                <td>{{ product.name }}</td>
+                <td>${{ product.price }}</td>
+                <td>
+                    <a href="{{ url_for('product_routes.update', product_id=product.id) }}" class="btn btn-warning btn-sm me-2">Update</a>
+
+                    <form method="post" action="{{ url_for('product_routes.delete', product_id=product.id) }}" style="display:inline;">
+                        <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}
+
+//update category.html 
+{% extends "base.html" %}
+
+{% block title %}Update Category{% endblock %}
+
+{% block content %}
+<div class="container my-4">
+    <h3 class="mb-4">Update Category</h3>
+    <form method="post" action="{{ url_for('category_routes.update', category_id=category.id) }}">
+        <div class="mb-3">
+            <label for="name" class="form-label">Category Name:</label>
+            <input type="text" class="form-control" id="name" name="name" value="{{ category.name }}" required>
+        </div>
+        <button type="submit" class="btn btn-primary">Update Category</button>
+    </form>
+</div>
+{% endblock %}
+
+//update.html 
+{% extends "base.html" %}
+
+{% block title %}
+Update Product
+{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2 class="mb-3">Updating Product</h2>
+
+    <!-- Update Form -->
+    <form method="post" action="{{ url_for('product_routes.update', product_id=product_id) }}">
+        <div class="mb-3">
+            <label for="name" class="form-label">Name:</label>
+            <input type="text" id="name" name="name" class="form-control" value="{{ product.name }}" required>
+        </div>
+
+        <div class="mb-3">
+            <label for="id" class="form-label">ID:</label>
+            <input type="number" id="id" name="id" class="form-control" value="{{ product.id }}" readonly>
+        </div>
+
+        <div class="mb-3">
+            <label for="price" class="form-label">Price:</label>
+            <input type="number" id="price" name="price" class="form-control" value="{{ product.price }}" step="0.01" required>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Update Product</button>
+    </form>
+
+    <!-- Delete Form (separate form for delete) -->
+    <form method="post" action="{{ url_for('product_routes.delete', product_id=product_id) }}" class="mt-4">
+        <button type="submit" class="btn btn-danger">Delete Product</button>
+    </form>
+</div>
+{% endblock %}
+
+//__init__.py
+from flask import Flask
+from .routes import main_routes
+from .product_routes import product_routes
+from .category_routes import category_routes
+
+def create_app():
+    app = Flask(__name__)
+
+    # Register blueprints
+    app.register_blueprint(main_routes)
+    app.register_blueprint(product_routes)
+    app.register_blueprint(category_routes)
+
+    return app
+
+    //app.py 
+    from app import create_app
+
+app = create_app()
+
+if __name__ == '__main__':
+    app.run(debug=True)
+
+    //category_routes.py 
+    from flask import Blueprint, request, render_template, redirect
+
+category_routes = Blueprint('category_routes', __name__)
+
+categories = []  
+
+@category_routes.route('/categories')
+def index():
+    return render_template('categories.html', categories=categories)
+
+
+@category_routes.route('/categories/create', methods=['GET', 'POST'])
+def create():
+    if request.method == 'POST':
+        new_category = {
+            'id': len(categories) + 1, 
+            'name': request.form['name']
+        }
+        categories.append(new_category)
+        return redirect('/categories')
+    return render_template('create_category.html')
+
+
+@category_routes.route('/categories/update/<int:category_id>', methods=['GET', 'POST'])
+def update(category_id):
+    if category_id <= len(categories) and category_id > 0:
+        if request.method == 'POST':
+            categories[category_id - 1]['name'] = request.form['name'] 
+            return redirect('/categories')
+        return render_template('update_category.html', category=categories[category_id - 1])
+    else:
+        return "Category do not exist", 404
+
+
+@category_routes.route('/categories/delete/<int:category_id>', methods=['POST'])
+def delete(category_id):
+    if category_id <= len(categories) and category_id > 0:
+        categories.pop(category_id - 1) 
+        return redirect('/categories')
+    else:
+        return "Category do not exist", 404
+
+
+// product_routes.py
+from flask import Blueprint, render_template, request, redirect, url_for
+
+product_routes = Blueprint('product_routes', __name__)
+
+# In-memory list to store products
+products = []
+# Sample product list for demonstration
+products = [
+    {'id': 1, 'name': 'Product A', 'price': 10.99},
+    {'id': 2, 'name': 'Product B', 'price': 12.99},
+    {'id': 3, 'name': 'Product C', 'price': 15.49}
+]
+
+ # Initialize a variable to keep track of the next product ID
+
+# Function to retrieve the list of products
+def get_products():
+    return products
+
+# Route to display the list of products
+@product_routes.route('/products')
+def index():
+    return render_template('index.html', products=get_products())
+
+# Route to create a new product
+@product_routes.route('/products/create', methods=['GET', 'POST'])
+def create():
+    if request.method == 'POST':
+        new_product = {
+            'id': request.form['ID'],  # Use the ID provided by the user
+            'name': request.form['name'],
+            'price': float(request.form['price'])  # Convert price to float
+        }
+        # Check if ID is unique
+        if any(product['id'] == new_product['id'] for product in products):
+            return "Product ID must be unique", 400  # Error if ID already exists
+        
+        products.append(new_product)
+        return redirect(url_for('product_routes.index'))  # Redirect to the product list
+    return render_template('create_product.html', title='Create Product')
+
+# Initialize products (Make sure this is defined at the top level)
+print(products)
+
+@product_routes.route('/products/update/<int:product_id>', methods=['GET', 'POST'])
+def update(product_id):
+    # Search for the product by ID
+    product = next((p for p in products if int(p['id']) == product_id), None)
+    
+    if product:
+        if request.method == 'POST':
+            # Only update the name and price, ID remains unchanged
+            product['name'] = request.form['name']
+            product['price'] = float(request.form['price'])
+            return redirect('/products')  # Redirect to the product list
+
+        # Pass the product and product_id to the template
+        return render_template('update.html', product=product, product_id=product_id)
+    else:
+        return "Product not found", 404  # Handle product not found
+
+@product_routes.route('/products/delete/<int:product_id>', methods=['POST'])
+def delete(product_id):
+    if product_id <= len(products) and product_id > 0:
+        del products[product_id - 1]  # Delete the product from the list
+        return redirect('/products')  # Redirect to the product list after deletion
+    else:
+        return "Product not found", 404
+//routes.py 
+from flask import Blueprint, render_template
+
+main_routes = Blueprint('main_routes', __name__)
+
+@main_routes.route('/')
+def home():
+    return render_template('home.html', title='Home')
+
+@main_routes.route('/about')
+def about():
+    return render_template('about.html', title='About', message='This is the about page.')
+
+@main_routes.route('/index')
+def index():
+    return render_template('index.html', title='Product Index')
+
+
